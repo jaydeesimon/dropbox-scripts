@@ -6,18 +6,10 @@
 (defn- year-month [dt]
   (fmt/unparse (:year-month fmt/formatters) dt))
 
-(defn- try-create-folder [path]
-  (try
-    (db/create-folder path)
-    (catch Exception e e)))
-
 (defn organize-by-year-month [entry-pred src dest]
-  (let [files (filter entry-pred (db/list-entries src))
-        year-month-fn (comp year-month :client_modified_dt)
-        grouped (group-by year-month-fn files)]
-    (do (run! try-create-folder
-              (map (partial str dest "/") (keys grouped)))
-        (run! #(util/move-file (str dest "/" (year-month-fn %)) %) files))))
+  (let [files (take 1 (filter entry-pred (db/list-entries src)))
+        year-month-fn (comp year-month :client_modified_dt)]
+    (run! #(util/move-file (str dest "/" (year-month-fn %)) %) files)))
 
 (comment
   ;; The pictures and videos from my phone are automatically

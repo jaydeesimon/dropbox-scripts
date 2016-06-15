@@ -7,7 +7,7 @@
   (fmt/unparse (:year-month fmt/formatters) dt))
 
 (defn organize-by-year-month [entry-pred src dest]
-  (let [files (take 1 (filter entry-pred (db/list-entries src)))
+  (let [files (filter entry-pred (db/list-entries src))
         year-month-fn (comp year-month :client_modified_dt)]
     (run! #(util/move-file (str dest "/" (year-month-fn %)) %) files)))
 
